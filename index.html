@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ClipCraft — Editor Video Aesthetic</title>
+<meta name="description" content="Ubah video mentah jadi konten aesthetic dalam hitungan detik. Upload, tulis brief, pilih gaya, download MP4." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&family=Caveat:wght@600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="bg-orbs"></div>
+
+<header class="topbar">
+  <div class="logo">
+    <span class="logo-ico">✨</span>
+    <span class="logo-txt">Clip<em>Craft</em></span>
+  </div>
+  <span class="badge-live">● Live Preview</span>
+</header>
+
+<!-- ============== VIEW: EDITOR ============== -->
+<main id="viewEditor" class="wrap">
+  <section class="hero">
+    <h1>Bikin video <span class="grad">aesthetic</span><br/>dari rekaman mentah kamu 🎬</h1>
+    <p class="sub">Upload → Tulis brief → Pilih gaya → Download MP4.<br/>Semuanya diproses di browser, tanpa install apapun.</p>
+  </section>
+
+  <form id="editorForm" class="panel" onsubmit="return false">
+
+    <!-- STEP 1: Upload -->
+    <div class="step">
+      <div class="step-head">
+        <span class="step-num">1</span>
+        <div>
+          <h3>Upload Video Mentah</h3>
+          <p>Format MP4 / MOV / WebM · Durasi maksimal 5 menit</p>
+        </div>
+      </div>
+
+      <label id="dropZone" class="drop">
+        <input type="file" id="videoInput" accept="video/*" hidden />
+        <div id="dropInner">
+          <div class="drop-ico">📤</div>
+          <p class="drop-title">Tarik &amp; lepas video di sini</p>
+          <p class="drop-hint">atau <span class="link">pilih dari perangkat</span></p>
+        </div>
+      </label>
+
+      <div id="fileMeta" class="file-meta hidden">
+        <video id="previewThumb" playsinline muted></video>
+        <div class="file-info">
+          <strong id="fileName">—</strong>
+          <span id="fileSize">—</span>
+          <span id="fileDur" class="tag-dur">—</span>
+        </div>
+        <button type="button" class="btn-x" id="removeFile" title="Hapus">✕</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Brief -->
+    <div class="step">
+      <div class="step-head">
+        <span class="step-num">2</span>
+        <div>
+          <h3>Brief / Konsep Video</h3>
+          <p>Tulis tone, pesan, atau caption yang kamu mau tampil di video.</p>
+        </div>
+      </div>
+      <textarea id="briefInput" rows="4" maxlength="600"
+        placeholder="Contoh: Vlog liburan ke Bali. Mau suasananya hangat & santai. Caption pembuka: 'Sunset pertama tahun ini 🌅'. Akhirnya: 'Sampai jumpa lagi, Bali ✈️'"></textarea>
+      <div class="counter"><span id="briefCount">0</span> / 600</div>
+    </div>
+
+    <!-- STEP 3: Style -->
+    <div class="step">
+      <div class="step-head">
+        <span class="step-num">3</span>
+        <div>
+          <h3>Pilih Gaya Editing</h3>
+          <p>Warna, font, dan emoji akan otomatis diterapkan ke video kamu.</p>
+        </div>
+      </div>
+      <div class="styles" id="styleGrid"></div>
+    </div>
+
+    <!-- STEP 4: Format -->
+    <div class="step">
+      <div class="step-head">
+        <span class="step-num">4</span>
+        <div>
+          <h3>Rasio &amp; Resolusi</h3>
+          <p>Sesuaikan dengan platform tujuan (TikTok, IG, YouTube, dll).</p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Rasio Aspek</label>
+          <div class="chips" id="ratioChips"></div>
+        </div>
+        <div class="field">
+          <label>Resolusi Output</label>
+          <div class="chips" id="resChips"></div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" id="processBtn" class="btn-primary" disabled>
+      <span class="btn-ico">🚀</span> Proses Editing Video
+    </button>
+    <p class="note">🔒 100% diproses lokal di browser kamu — video tidak diunggah ke server manapun.</p>
+  </form>
+</main>
+
+<!-- ============== VIEW: LOADING ============== -->
+<main id="viewLoading" class="wrap hidden">
+  <div class="loading-box">
+    <div class="spinner">
+      <div></div><div></div><div></div>
+    </div>
+    <h2 id="loadingTitle">Memproses video kamu...</h2>
+    <p id="loadingSub">Menerapkan filter, teks, dan emoji aesthetic ✨</p>
+    <div class="progress"><div id="progressBar"></div></div>
+    <span id="progressPct" class="pct">0%</span>
+  </div>
+</main>
+
+<!-- ============== VIEW: PREVIEW ============== -->
+<main id="viewPreview" class="wrap hidden">
+  <section class="hero small">
+    <h1>Hasil <span class="grad">Editing</span> kamu 🎉</h1>
+    <p class="sub">Tonton hasilnya dulu, lalu download dalam format MP4.</p>
+  </section>
+
+  <div class="preview-panel">
+    <div class="video-frame">
+      <video id="resultVideo" controls playsinline></video>
+    </div>
+    <div class="preview-actions">
+      <a id="downloadBtn" class="btn-primary" download="clipcraft-output.mp4">
+        <span class="btn-ico">⬇</span> Download MP4
+      </a>
+      <button type="button" id="againBtn" class="btn-ghost">← Edit Video Lain</button>
+    </div>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<!-- Hidden working elements -->
+<video id="workVideo" playsinline crossorigin="anonymous"></video>
+<canvas id="workCanvas"></canvas>
+
+<script src="js/app.js"></script>
+</body>
+</html>
